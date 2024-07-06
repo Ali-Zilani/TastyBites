@@ -9,7 +9,10 @@ function Main() {
     <div>
         <Navbar/>
         {/* all children will render from here */}
-        <Outlet/> 
+        <div className='min-h-screen'>
+          <Outlet/> 
+        </div>
+    
         <Footer/>
     </div>
   )
