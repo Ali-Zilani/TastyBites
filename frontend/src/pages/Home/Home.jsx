@@ -3,6 +3,8 @@ import Banner from '../../components/Banner'
 import Categories from './Categories'
 import SpecialDishes from './SpecialDishes'
 import Testimonials from './Testimonials'
+import OurServices from './OurServices'
+
 
 function Home() {
   return (
@@ -11,6 +13,7 @@ function Home() {
       <Categories/>
       <SpecialDishes/>
       <Testimonials/>
+      <OurServices/>
     </div>
   )
 }
