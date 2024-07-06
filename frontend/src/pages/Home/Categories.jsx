@@ -13,7 +13,7 @@ function  Categories() {
 
         <div className='text-center'>
             <p className='subtitle'>Customer Favorites</p>
-            <h2 className='text-4xl md:text-5xl font-bold my-2 md:leading-snug leading-snug'>Popular Categories</h2>
+            <h2 className='title'>Popular Categories</h2>
         </div>
 
         {/* category cards */}
