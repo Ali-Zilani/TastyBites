@@ -1,7 +1,8 @@
 import React,{useState,useEffect} from 'react'
 import logo from '/logo.png'
 import { Link } from 'react-router-dom'
-import { BiSolidPhoneCall } from "react-icons/bi";
+import { FaRegUser } from "react-icons/fa";
+import Modal from './Modal'
 
 function Navbar() {
     // to handle scroll bar shadow on moving on y axis
@@ -111,8 +112,12 @@ function Navbar() {
                     <span className="badge badge-sm indicator-item">8</span>
                     </div>
                 </div>
-                {/* contact btn */}
-                <a className="btn bg-green rounded-full px-6 text-white flex items-center gap-2"><BiSolidPhoneCall />Contact</a>
+                {/* login btn */}
+                <button 
+                    onClick={()=>document.getElementById('my_modal_5').showModal()}
+                    className="btn bg-green rounded-full px-6 text-white flex items-center gap-2"><FaRegUser />Login
+                </button>
+                <Modal/>
             </div>
         </div>
     </header>
