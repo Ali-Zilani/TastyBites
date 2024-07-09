@@ -1,22 +1,43 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { FaGoogle,FaFacebookF,FaGithub  } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import {useForm} from "react-hook-form"
 import { AuthContext } from "../contexts/AuthProvider";
 
 function Modal() {
+  const [errorMessage, setErrorMessage] = useState("");
 
   const { register, handleSubmit,  formState: { errors } } = useForm();
-  const {signUpWithGmail} = useContext(AuthContext);
+  const {signUpWithGmail,login} = useContext(AuthContext);
 
-  const onSubmit = data => console.log(data);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || '/'
+
+  const onSubmit = (data) => {
+    const {email,password} = data;
+    login(email,password)
+    .then((res)=>{
+      const user = res.user ;
+      alert('Login Successful!');
+      document.getElementById('my_modal_5').close(); // close the dialoga after login
+      navigate(from,{replace:true});
+    }).catch((err)=>{
+      const errorMessage = err.message;
+      setErrorMessage("Invalid credentails")
+    })
+  }
 
   const handleLogin = ()=>{
     signUpWithGmail()
     .then((res) => {
-      const user = res.user 
-      alert('Login Successfull!')
-    }).catch((err) => console.log(err))
+      const user = res.user;
+      alert('Login Successful!');
+      navigate(from,{replace:true});
+    }).catch((err) => {
+      const errMessage = err.message;
+      setErrorMessage("Provide correct email and password")
+    })
   }
 
 
@@ -36,7 +57,7 @@ function Modal() {
                 placeholder="email"
                 className="input input-bordered"
                 required
-                {...register("eamil")}
+                {...register("email")}
               />
             </div>
             {/* password input */}
@@ -58,7 +79,7 @@ function Modal() {
               </label>
             </div>
             {/* error text */}
-            
+            {errorMessage ? <p className="text-red text-xs italic">{errorMessage}</p> : ""}
             {/* Login btn */}
             <div className="form-control mt-6">
               <input type="submit" value="Login" className="btn bg-green text-white" />

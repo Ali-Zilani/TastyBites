@@ -1,16 +1,35 @@
-import React from "react";
+import React, {useContext,useState} from "react";
 import { FaGoogle, FaFacebookF, FaGithub } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import Modal from "./Modal";
+import { AuthContext } from "../contexts/AuthProvider";
 
 function Signup() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const [errorMessage,setErrorMessage] = useState("");
+  const {register,handleSubmit,formState: { errors }} = useForm();
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const from = location.state?.from?.pathname || '/'
+
+  const {createUser,login} = useContext(AuthContext);
+
+  
+  const onSubmit = (data) => {
+    const {email,password} = data;
+    createUser(email,password)
+    .then((res)=>{
+      const user = res.user;
+      alert("Account Created Successfully!")
+      navigate(from,{replace:true})
+    }).catch((err)=>{
+      const errorMessage = err.message ;
+      const errorCode = err.code ;
+      setErrorMessage("Provide correct email and password");
+    })
+  };
+
   return (
     <div className="max-w-md bg-white shadow w-full mx-auto flex items-center justify-center mt-20">
       <div className="modal-action flex flex-col justify-center mt-0">
@@ -30,7 +49,7 @@ function Signup() {
               placeholder="email"
               className="input input-bordered"
               required
-              {...register("eamil")}
+              {...register("email")}
             />
           </div>
           {/* password input */}
@@ -45,14 +64,14 @@ function Signup() {
               required
               {...register("password")}
             />
-            <label className="label">
+            {/* <label className="label">
               <a href="#" className="label-text-alt link link-hover mt-1">
                 Forgot password?
               </a>
-            </label>
+            </label> */}
           </div>
           {/* error text */}
-
+          {errorMessage ? <p className="text-red text-xs italic">{errorMessage}</p>:""}
           {/* Login btn */}
           <div className="form-control mt-6">
             <input
