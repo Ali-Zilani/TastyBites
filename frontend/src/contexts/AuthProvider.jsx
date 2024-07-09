@@ -7,11 +7,11 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 function AuthProvider({children}) {
-    const [user,setUser] = useState("test");
+    const [user,setUser] = useState("");
     const [loading,setLoading] = useState(true);
 
-    // create an account
-    const createUser = (email,password) => {
+    // create an account 
+    const createUser = (email,password) => { 
         return createUserWithEmailAndPassword(auth,email,password)
     }
     // signup with gmail account
@@ -50,6 +50,7 @@ function AuthProvider({children}) {
 
     const authInfo = {
         user,
+        loading,
         createUser,
         signUpWithGmail,
         login,
