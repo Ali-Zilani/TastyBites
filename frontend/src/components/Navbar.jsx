@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { FaRegUser } from "react-icons/fa";
 import Modal from './Modal'
 import { AuthContext } from '../contexts/AuthProvider';
+import Profile from './Profile';
 
 function Navbar() {
     // to handle scroll bar shadow on moving on y axis
@@ -119,10 +120,12 @@ function Navbar() {
                     </div>
                 </div>
                 {/* login btn */}
-                <button 
+                {
+                    user ? <Profile user={user} /> : <button 
                     onClick={()=>document.getElementById('my_modal_5').showModal()}
                     className="btn bg-green rounded-full px-6 text-white flex items-center gap-2"><FaRegUser />Login
-                </button>
+                   </button>
+                }
                 <Modal/>
             </div>
         </div>
