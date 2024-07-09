@@ -1,12 +1,18 @@
-import React,{useState,useEffect} from 'react'
+import React,{useState,useEffect, useContext} from 'react'
 import logo from '/logo.png'
 import { Link } from 'react-router-dom'
 import { FaRegUser } from "react-icons/fa";
 import Modal from './Modal'
+import { AuthContext } from '../contexts/AuthProvider';
 
 function Navbar() {
     // to handle scroll bar shadow on moving on y axis
     const [isSticky,setSticky] = useState(false);
+
+    const {user} = useContext(AuthContext);
+    console.log(user);
+
+    
     useEffect(()=>{
         const handleScroll = () => {
             const offset = window.scrollY ;

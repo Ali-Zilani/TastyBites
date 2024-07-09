@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useContext } from "react";
 import { FaGoogle,FaFacebookF,FaGithub  } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import {useForm} from "react-hook-form"
+import { AuthContext } from "../contexts/AuthProvider";
 
 function Modal() {
 
   const { register, handleSubmit,  formState: { errors } } = useForm();
+  const {signUpWithGmail} = useContext(AuthContext);
+
   const onSubmit = data => console.log(data);
+
+  const handleLogin = ()=>{
+    signUpWithGmail()
+    .then((res) => {
+      const user = res.user 
+      alert('Login Successfull!')
+    }).catch((err) => console.log(err))
+  }
+
 
   return (
     <dialog id="my_modal_5" className="modal modal-middle sm:modal-middle">
@@ -62,7 +74,7 @@ function Modal() {
           </form>
           {/* social media icon for sign in*/}
           <div className="text-center space-x-3 mb-5">
-            <button className="btn btn-circle hover:bg-green hover:text-white"><FaGoogle/></button>
+            <button onClick={handleLogin} className="btn btn-circle hover:bg-green hover:text-white"><FaGoogle/></button>
             <button className="btn btn-circle hover:bg-green hover:text-white"><FaFacebookF /></button>
             <button className="btn btn-circle hover:bg-green hover:text-white"><FaGithub/></button>
           </div>
