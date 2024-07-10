@@ -5,7 +5,13 @@ import { AuthContext } from "../contexts/AuthProvider";
 
 function Profile({user}) {
     //console.log({user})
+<<<<<<< HEAD
     const {photoURL:userImageURL} = {user} ;
+=======
+  
+   const {photoURL:userImageURL} = {user} ;
+
+>>>>>>> 12b0c4ebe80a257afe7cb29ddf80aa24b3139a40
     const {logout} = useContext(AuthContext);
     const handleLogout = () => {
       logout()
