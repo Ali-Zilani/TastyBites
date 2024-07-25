@@ -38,7 +38,7 @@ function Signup() {
           className="card-body"
           method="dialog"
         >
-          <h3 className="font-bold text-lg">Create a account</h3>
+          <h3 className="font-bold text-lg">Create an account</h3>
           <div className="form-control">
             {/* email input */}
             <label className="label">

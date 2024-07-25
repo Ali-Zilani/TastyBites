@@ -7,16 +7,16 @@ const port = process.env.PORT || 5000;
 
 // Middleware
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); 
 
 app.get('/', (req, res) => {
     res.send('Bismillah!.. Its start of Backend for Foodi Project');
 });
   
 // MongoDB configuration
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = `mongodb+srv://moalizilani:${process.env.DB_PASSWORD}@cluster0.h85cu8v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+const { createConnection } = require('mongoose');
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.h85cu8v.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
   
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -26,21 +26,56 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   }
 });
-
+ 
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
+    
+    // databses & collections
+    const menuCollections = client.db("Foodi-MERN").collection("menus");
+    const cartCollections = client.db("Foodi-MERN").collection("cartItems");
+
+    //all menu items operations
+    app.get('/menu',async(req,res)=>{
+      const result = await menuCollections.find().toArray();
+      res.send(result);
+    })
+
+    // all cart operation
+    //posting cart to db
+    app.post('/carts',async(req,res)=>{
+      const cartItem = req.body;
+      const result = await cartCollections.insertOne(cartItem);
+      res.send(result);
+    })
+    // get carts using email
+    app.get('/carts',async(req,res)=>{
+      const userEmail = req.query.email;
+      const result = await cartCollections.find({email:userEmail}).toArray();
+      res.send(result);
+    })
+    //get specific carts
+    app.get('/carts/:id', async(req,res)=>{
+      const id = req.params.id ;
+      const filter = {_id: new ObjectId(id)};
+      const result = await cartCollections.findOne(id);
+      res.send(result);
+    })
+    //delete items from cart
+    app.delete('/carts/:id',async(req,res)=>{
+      const id = req.params.id ;
+      const filter = {_id: new ObjectId(id)};
+      const result = await cartCollections.deleteOne(filter);
+      res.send(result)
+    })
+
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    
   }
-}
+}  
 run().catch(console.dir);
-
 
 app.listen(port, () => {
     console.log(`Server is listening on port: ${port}`);

@@ -5,6 +5,7 @@ import { FaRegUser } from "react-icons/fa";
 import Modal from './Modal'
 import { AuthContext } from '../contexts/AuthProvider';
 import Profile from './Profile';
+import useCart from '../hooks/useCart';
 
 function Navbar() {
     // to handle scroll bar shadow on moving on y axis
@@ -13,6 +14,9 @@ function Navbar() {
     const {user} = useContext(AuthContext);
     console.log(user);
 
+    //tankstack state manager
+    const[cart,refetch] = useCart();
+    //console.log(cart);
     
     useEffect(()=>{
         const handleScroll = () => {
@@ -53,6 +57,7 @@ function Navbar() {
         </li>
         <li><a>Offers</a></li>
     </>);
+    
   return (
     <header className='max-w-screen-2xl container mx-auto fixed top-0 left-0 right-0 '>
         <div className={`navbar xl:px-24 ${isSticky ? 'shadow-md bg-base-100  transition-all duration-300 ease-in-out' : ''}`}>
@@ -101,24 +106,26 @@ function Navbar() {
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </button>
-                {/* card items btn*/}
-                <div tabIndex={0} role="button" className="btn btn-ghost btn-circle mr-3 hidden sm:flex items-center justify-center ">
-                    <div className="indicator">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-5 w-5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                    <span className="badge badge-sm indicator-item">8</span>
+                {/* card items */}
+                <Link to='/cart-page'>
+                    <div tabIndex={0} role="button" className="btn btn-ghost btn-circle mr-3 hidden sm:flex items-center justify-center ">
+                        <div className="indicator">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-5 w-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        <span className="badge badge-sm indicator-item">{cart.length || 0}</span>
+                        </div>
                     </div>
-                </div>
+                </Link>
                 {/* login btn */}
                 {
                     user ? <Profile user={user} /> : <button 
