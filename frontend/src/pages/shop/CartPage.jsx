@@ -1,55 +1,122 @@
+import { useContext, useState } from "react";
 import useCart from "../../hooks/useCart";
-import {FaTrash} from "react-icons/fa";
-import Swal from 'sweetalert2'
+import { FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
+import { AuthContext } from "../../contexts/AuthProvider";
 
 function CartPage() {
   const [cart, refetch] = useCart();
   console.log(typeof cart);
   // console.log("this is cart data",cart)
 
-    // handleDelete item from cart
-    const handleDelete = (item) => {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!"
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`http://localhost:5000/carts/${item._id}`, {
-            method: "DELETE"
-          })
-          .then(res => res.json())
-          .then(data => {
+  const { user } = useContext(AuthContext);
+  const [cartItems, setCartItems] = useState([]);
+
+  //calculate price
+  const calculatePrice = (item) => {
+    return item.price * item.quantity;
+  };
+
+  //calculate total price
+  const calculteTotalPrice = cart.reduce((total,item)=>{
+    return total+calculatePrice(item)
+  },0)
+  //
+
+  // handleDelete item from cart
+  const handleDelete = (item) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`http://localhost:5000/carts/${item._id}`, {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then((data) => {
             if (data.deletedCount > 0) {
               refetch();
               Swal.fire({
                 title: "Deleted!",
                 text: "Your item has been deleted.",
-                icon: "success"
+                icon: "success",
               });
             } else {
               Swal.fire({
                 title: "Error!",
                 text: "There was an error deleting your item.",
-                icon: "error"
+                icon: "error",
               });
             }
           })
-          .catch(error => {
+          .catch((error) => {
             Swal.fire({
               title: "Error!",
               text: "There was an error deleting your item.",
-              icon: "error"
+              icon: "error",
             });
           });
-        }
+      }
+    });
+  };
+  // handleDecrease of quantity
+  const handleDecrease = (item) => {
+    if (item.quantity > 1) {
+      fetch(`http://localhost:5000/carts/${item._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify({ quantity: item.quantity - 1 }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          const updatedCart = cartItems.map((cartItem) => {
+            if (cartItem.id === item.id) {
+              return {
+                ...cartItem,
+                quantity: cartItem.quantity - 1,
+              };
+            }
+            return cartItem;
+          });
+        });
+      refetch();
+      setCartItems(updatedCart);
+    } else {
+      alert("Item can't be zero");
+    }
+  };
+  // handleIncrease of quantity
+  const handleIncrease = (item) => {
+    fetch(`http://localhost:5000/carts/${item._id}`, {
+      method: "PUT",
+      headers: {
+        "Content-type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify({ quantity: item.quantity + 1 }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        const updatedCart = cartItems.map((cartItem) => {
+          if (cartItem.id === item.id) {
+            return {
+              ...cartItem,
+              quantity: cartItem.quantity + 1,
+            };
+          }
+          return cartItem;
+        });
       });
-    };
-    
+    refetch();
+    setCartItems(updatedCart);
+  };
   return (
     <div className="section-container">
       {/* banner */}
@@ -65,7 +132,7 @@ function CartPage() {
       </div>
 
       {/* cart table */}
-      <dir>
+      <div>
         <div className="overflow-x-auto">
           <table className="table">
             {/* head */}
@@ -99,18 +166,34 @@ function CartPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="font-semibold">
-                      {item.name}
-                    </td>
+                    <td className="font-semibold">{item.name}</td>
                     <td>
-                      {item.quantity}
+                      <button
+                        className="btn btn-xs"
+                        onClick={() => handleDecrease(item)}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={() => console.log(item.quantity)}
+                        className="w-10 mx-2 text-center overflow-hidden"
+                      />
+                      <button
+                        className="btn btn-xs"
+                        onClick={() => handleIncrease(item)}
+                      >
+                        +
+                      </button>
                     </td>
-                    <td>
-                      {item.price}
-                    </td>
+                    <td>{calculatePrice(item).toFixed(2)}</td>
                     <th>
-                      <button className="btn btn-ghost text-red btn-xs" onClick={()=> handleDelete(item)}>
-                        <FaTrash/>
+                      <button
+                        className="btn btn-ghost text-red btn-xs"
+                        onClick={() => handleDelete(item)}
+                      >
+                        <FaTrash />
                       </button>
                     </th>
                   </tr>
@@ -119,7 +202,23 @@ function CartPage() {
             </tbody>
           </table>
         </div>
-      </dir>
+      </div>
+
+      {/* customer details */}
+      <div className="my-12 md:space-y-0 space-y-6 flex flex-col md:flex-row justify-between items-start">
+        <div className="md:w-1/2 space-y-3">
+          <h3 className="font-medium">Customer Details</h3>
+          <p>Name: {user.displayName} </p>
+          <p>Email: {user.email} </p>
+          <p>User_id: {user.uid} </p>
+        </div>
+        <div className="md:w-1/2 space-y-3">
+          <h3 className="font-medium">Shipping Details</h3>
+          <p>Total Items: {cart.length} </p>
+          <p>Total Price: {calculteTotalPrice.toFixed(2)}</p>
+          <button className="btn bg-green text-white">Proceed Checkout</button>
+        </div>
+      </div>
     </div>
   );
 }
